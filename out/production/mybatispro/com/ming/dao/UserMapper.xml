@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ming.dao.UserMapper">
+        <select id="findById" resultType="com.ming.po.User" parameterType="int">
+            select  id,name,password,iphone,emp_id
+             from tbl_user where emp_id = #{id}
+        </select>
+</mapper>

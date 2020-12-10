@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ming.dao.EmployeeMapper">
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+    <resultMap id="employeeResult" type="com.ming.po.Employee">
+        <id property="id" column="id"/>
+        <result property="lastName" column="last_name" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="VARCHAR"/>
+        <!--一对多分表查询UserMapper.findById-
+          <collection property="user"  select="com.ming.dao.UserMapper.findById" column="id"></collection>
+        -->
+        <collection property="userList" ofType="com.ming.po.User">
+            <id property="id" column="userId" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="iphone" column="iphone" jdbcType="VARCHAR"/>
+            <result property="empId" column="emp_id" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <!--一对多分表查询-->
+    <!--<select id="findEmList" resultMap="employee" parameterType="java.lang.Integer">
+            select  em.id,em.last_name, em.email, em.gender
+            from tbl_employee as em
+            where em.id  =#{value}
+    </select>-->
+    <!--一对多查询-->
+    <select id="findEmList" resultMap="employeeResult">
+        <![CDATA[
+        SELECT
+            em.id,
+            em.last_name,
+            em.email,
+            em.gender,
+            u.id as userId,
+            u.emp_id,
+            u.name,
+            u. PASSWORD,
+            u.iphone
+        FROM
+            tbl_employee AS em,
+        tbl_user AS u
+        WHERE
+         em.id = u.emp_id
+        AND  em.id=#{id}
+        ]]>
+    </select>
+
+
+    <!--    <select id="finEmpByMap" parameterType="java.util.List" resultMap="employee">
+            select * from tbl_employee where
+            <foreach collection="list" item="item" open="(" close=")" separator="or">
+                (gender = #{item.gender} and last_name = #{item.lastName})
+            </foreach>
+        </select>-->
+    <!--
+    namespace名称空间，指定为接口的全类名
+    id：唯一标识
+    resultType:返回值类型
+     #{id}：从传递过来参数中取出id值
+    -->
+    <!-- resultType返回的权限定类名com.ming.po.Employee可以写成类名Employee-->
+    <select id="getEmpByID" resultType="com.ming.po.Employee" databaseId="mysql">
+        select id,last_name AS lastName,gender,email from tbl_employee
+        <where>
+            <choose>
+                <when test="_parameter!=null">
+                     id = #{id}
+                </when>
+                <otherwise>
+                    dept_id=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--parameterType：可以省略
+    useGeneratedKeys使用自增主键获取主键值策略
+    keyProperty:指定对应的主键属性，也就是mybatis获取主键后，将这个值封装给JavaBean的哪个属性
+    -->
+    <insert id="addEmp" parameterType="com.ming.po.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert  into tbl_employee(last_name,gender,email) values (#{lastName},#{gender} ,#{email});
+    </insert>
+
+    <update id="updateEmp" parameterType="com.ming.po.Employee">
+        update  tbl_employee
+        set last_name = #{last_name},gender = #{gender} ,email = #{email}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEmpByID" parameterType="java.lang.Integer">
+        delete from tbl_employee where  id = #{id}
+    </delete>
+<!--
+collection：指定要遍历的集合：
+list类型的参数会特殊处理封装在map中，map的key就叫list
+item：将当前遍历出的元素赋值给指定的变量
+separator:每个元素之间的分隔符
+open：遍历出所有结果拼接一个开始的字符
+close:遍历出所有结果拼接一个结束的字符
+index:索引。遍历list的时候是index就是索引，item就是当前值
+遍历map的时候index表示的就是map的key，item就是map的值
+#{变量名}就能取出变量的值也就是当前遍历出的元素
+-->
+<select id="getEmpByIn" parameterType="java.util.Map" resultType="com.ming.po.Employee">
+    select * from tbl_employee
+    <where>
+        <if test="ids!=null and ids.size()>1">
+            <foreach collection="ids" item="id" open="id in (" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+    </where>
+</select>
+</mapper>

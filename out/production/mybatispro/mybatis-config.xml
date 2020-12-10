@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="dbconfig.properties"/>
+    <!--
+     settings包含很多重要的设置项
+     setting来设置每一个设置项，name名称，value取值
+     -->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="false"/>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+    <!-- <typeAliases>
+          <typeAlias alias="Employee" type="com.ming.po.Employee"></typeAlias>
+          &lt;!&ndash;name需要扫描的包&ndash;&gt;
+         <package name="com.ming.po"/>
+     </typeAliases>-->
+    <!-- 环境配置，可以配置多个环境 default指定使用某种环境，可以快速到达切换测试环境和生产环境-->
+    <environments default="development">
+        <!--  environment用来配置一个具体的环境信息：id环境标识，唯一,
+        必须有两个标签
+        transactionManager事务管理器,type事物管理器类型：JDBC|MANAGED
+        dataSource数据源POOLED
+
+        -->
+        <environment id="development">
+            <!-- 事务管理器工厂配置 -->
+            <transactionManager type="JDBC"/>
+            <!-- 数据源工厂配置，使用工厂来创建数据源 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--databaseIdProvider支持多数据库厂商
+         type="DB_VENDOR" VendorDatabaseIdProvider作用：就是得到数据库厂商的标识
+         databaseId="mysql"告知Mapper.xml中的sql语句是在mysql环境下查询的
+    -->
+    <databaseIdProvider type="DB_VENDOR">
+        <!--为不同的数据库起别名-->
+        <property name="MySQL" value="mysql"/>
+        <property name="Oracle" value="oracle"/>
+        <property name="SQL Server" value="sqlServer"/>
+    </databaseIdProvider>
+    <!--写好的sql映射文件一定要注册到全局配置文件中-->
+    <!--mappers将SQL映射注册到全局配置中-->
+    <mappers>
+        <!--mapper注册一个sql映射文件
+        注册配置文件的：
+        resource:引用类路径下的sql映射文件
+        url:网络路径或磁盘下的sql映射文件
+        注册接口
+         class：引用注册接口
+         1.有sql映射文件，映射文件必须和接口同名，并且放在与接口同一目录下
+         2.没有sql映射文件，所有的sql都是利用注解写在接口上
+        -->
+        <!-- <mapper resource="EmployeeMapper.xml"/>-->
+        <!--<mapper class="com.ming.dao.EmployeeMapper"/>-->
+        <!--  package 批量注册的
+          映射文件必须和接口同名，并且放在与接口同一目录下-->
+        <package name="com.ming.dao"/>
+        <!-- <mapper url="file:///E:/javacode/idea_workspace/mybatispro/config/EmployeeMapper.xml"/>-->
+    </mappers>
+</configuration>
