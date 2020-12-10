@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ming.dao.OrderMapper">
+    <!--一对一映射-->
+    <resultMap id="oneOrderResult" type="com.ming.po.Order">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="up_time" property="upTime"/>
+      <!--  <result column="uId" property="user.id"/>
+        <result column="name" property="user.name"/>
+        <result column="iphone" property="user.iphone"/>-->
+      <association property="user" javaType="com.ming.po.User">
+            <result column="uId" property="id"/>
+            <result column="name" property="name"/>
+            <result column="iphone" property="iphone"/>
+        </association>
+    </resultMap>
+    <select id="findOneOrderById" resultMap="oneOrderResult" parameterType="int">
+        <![CDATA[
+        SELECT
+            o.id,
+            o.user_id,
+            o.create_time,
+            o.up_time,
+            u.id AS uId,
+            u. NAME,
+            u.iphone
+        FROM
+            t_order o
+        LEFT JOIN tbl_user u ON o.user_id = u.id
+        WHERE
+            o.id = #{id}]]>
+    </select>
+    <!--一对多映射-->
+    <resultMap id="orderResult" type="com.ming.po.Order" >
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="up_time" property="upTime"/>
+        <collection property="orderDetailModelList" ofType="com.ming.po.OrderDetail">
+            <id column="orderDetailId" property="id"/>
+            <result column="order_id" property="orderId"/>
+            <result column="goods_id" property="goodsId"/>
+            <result column="num" property="num"/>
+            <result column="total_price" property="totalPrice"/>
+        </collection>
+    </resultMap>
+     <select id="findOrderListById" resultMap="orderResult">
+         <![CDATA[
+    SELECT
+        a.id ,
+        a.user_id,
+        a.create_time,
+        a.up_time,
+        b.id orderDetailId,
+        b.order_id,
+        b.goods_id,
+        b.num,
+        b.total_price
+    FROM
+        t_order a,
+        t_order_detail b
+    WHERE
+        a.id = b.order_id
+        AND a.id = #{id}
+    ]]>
+     </select>
+</mapper>
