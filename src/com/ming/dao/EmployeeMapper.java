@@ -3,7 +3,6 @@ package com.ming.dao;
 import com.ming.po.Employee;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +16,17 @@ public interface EmployeeMapper {
 
     public void addEmp(Employee employee);
 
+    public Long addEmps(Employee employee);
+
     public void deleteEmpByID(Integer id);
 
     public void updateEmp(Employee employee);
 
     public List<Employee> getEmpByIn(Map<String,Object> empMap);
+
+
+    public List<Employee> getEmpList();
+
+
+    public List<Employee> getEmps(Integer id);
 }

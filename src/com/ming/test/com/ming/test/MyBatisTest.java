@@ -1,23 +1,21 @@
 package com.ming.test;
 
+import com.github.pagehelper.PageHelper;
 import com.ming.dao.DepartmentMapper;
 import com.ming.dao.EmployeeMapper;
 import com.ming.po.Department;
 import com.ming.po.Employee;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 测试mybatis-config.xml
@@ -57,6 +55,10 @@ public class MyBatisTest {
         }
     }
 
+    /**
+     * mybatis运行原理以查询为例
+     * @throws IOException
+     */
     @Test
     public void testInterface() throws IOException {
         SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
@@ -65,15 +67,49 @@ public class MyBatisTest {
             EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
             Employee employee = employeeMapper.getEmpByID(1);
             System.out.println(employee);
-            Employee employee2 = employeeMapper.getEmpByID(5);
-            System.out.println(employee2);
-            System.out.println(employee==employee2);
 
         }finally {
             sqlSession.close();
         }
     }
-        @Test
+
+    /**
+     *  插件原理
+     *
+     *   protected BaseStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+
+     *     this.parameterHandler = configuration.newParameterHandler(mappedStatement, parameterObject, boundSql);
+     *     this.resultSetHandler = configuration.newResultSetHandler(executor, mappedStatement, rowBounds, parameterHandler, resultHandler, boundSql);
+     *   }
+     *    configuration.newParameterHandler创建四大对象时调用parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
+     *
+     *     public Object pluginAll(Object target) {
+     *     for (Interceptor interceptor : interceptors) {
+     *       target = interceptor.plugin(target);
+     *     }
+     *     return target;
+     *   }
+     *   在四大对象创建的时候
+     *   1、每个创建出来的对象不是直接返回的，而是调用pluginAll()返回
+     *   2、获取所有的interceptor(拦截器)（插件需要实现的接口）调用interceptor.plugin(target);返回target包装后的对象
+     *   3、插件机制、我们可以使用插件为目标对象创建一个代理对象 AOP机制
+     *   我们的插件可以为四大对象创建出代理对象
+     *   代理对象可以拦截到四大对象的每一个执行方法
+     */
+    //步骤
+    //1、编写Interceptor接口的实现类
+    // 2、使用@Intercepts完成插件签名
+    //3、将写好的插件注册到全局配置文件中
+    @Test
+    public void testPlugin() throws IOException {
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
+        PageHelper.startPage(1,10);
+        List<Employee> empList = employeeMapper.getEmpList();
+        empList.stream().forEach(System.out::println);
+    }
+    @Test
     public  void addEmp() throws IOException {
         SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
         SqlSession sqlSession = sqlSessionFactory.openSession();
@@ -84,6 +120,27 @@ public class MyBatisTest {
             employee.setEmail("524933@qq.com");
             employee.setGender("男");
             employeeMapper.addEmp(employee);
+            sqlSession.commit();
+        }finally {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public  void addBatchEmp() throws IOException {
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+        //可以执行批量操作的sqlsession
+        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
+        try {
+            EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
+            for (int i = 0; i < 1000; i++) {
+                Employee employee = new Employee();
+                employee.setLastName(UUID.randomUUID().toString().substring(0,5));
+                employee.setEmail("524933@qq.com");
+                employee.setGender("男");
+                employeeMapper.addEmps(employee);
+            }
             sqlSession.commit();
         }finally {
             sqlSession.close();
@@ -157,6 +214,19 @@ public class MyBatisTest {
             map.put("ids",list);
           List<Employee>  employeeList =  employeeMapper.getEmpByIn(map);
             System.out.println(employeeList);
+        }finally {
+            sqlSession.close();
+        }
+    }
+    
+    @Test
+    public void procedureTest() throws IOException {
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
+            List<Employee> emps = employeeMapper.getEmps(1);
+            System.out.println(emps);
         }finally {
             sqlSession.close();
         }

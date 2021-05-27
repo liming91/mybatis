@@ -17,6 +17,20 @@
           &lt;!&ndash;name需要扫描的包&ndash;&gt;
          <package name="com.ming.po"/>
      </typeAliases>-->
+    <!-- 注册插件-->
+    <plugins>
+<!--        <plugin interceptor="com.ming.plugin.MyPlugin">-->
+<!--            <property name="username" value="root"/>-->
+<!--            <property name="password" value="123456"/>-->
+<!--        </plugin>-->
+<!--        <plugin interceptor="com.ming.plugin.MySecondPlugin">-->
+<!--        </plugin>-->
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <property name="param1" value="value1"/>
+        </plugin>
+    </plugins>
     <!-- 环境配置，可以配置多个环境 default指定使用某种环境，可以快速到达切换测试环境和生产环境-->
     <environments default="development">
         <!--  environment用来配置一个具体的环境信息：id环境标识，唯一,
@@ -47,6 +61,7 @@
         <property name="Oracle" value="oracle"/>
         <property name="SQL Server" value="sqlServer"/>
     </databaseIdProvider>
+
     <!--写好的sql映射文件一定要注册到全局配置文件中-->
     <!--mappers将SQL映射注册到全局配置中-->
     <mappers>
@@ -66,4 +81,5 @@
         <package name="com.ming.dao"/>
         <!-- <mapper url="file:///E:/javacode/idea_workspace/mybatispro/config/EmployeeMapper.xml"/>-->
     </mappers>
+
 </configuration>
