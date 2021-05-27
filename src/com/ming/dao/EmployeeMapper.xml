@@ -84,6 +84,10 @@
         insert  into tbl_employee(last_name,gender,email) values (#{lastName},#{gender} ,#{email});
     </insert>
 
+    <insert id="addEmps" parameterType="com.ming.po.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert  into tbl_employee(last_name,gender,email) values (#{lastName},#{gender} ,#{email});
+    </insert>
+
     <update id="updateEmp" parameterType="com.ming.po.Employee">
         update  tbl_employee
         set last_name = #{last_name},gender = #{gender} ,email = #{email}
@@ -114,4 +118,22 @@ index:索引。遍历list的时候是index就是索引，item就是当前值
         </if>
     </where>
 </select>
+
+    <select id="getEmpList" resultType="com.ming.po.Employee" >
+            select em.id,em.last_name AS lastName, em.email, em.gender
+            from tbl_employee as em
+    </select>
+    
+    <!--mysql储存过程调用-->
+   <!-- public List<Employee> getEmps(Integer id);-->
+    <select id="getEmps" statementType="CALLABLE" resultMap="procedureEmp">
+        CALL mb_emps(#{userId,mode=IN,jdbcType=INTEGER});
+    </select>
+
+    <resultMap id="procedureEmp" type="com.ming.po.Employee">
+        <id property="id" column="id"></id>
+        <result property="lastName" column="last_name" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="VARCHAR"/>
+    </resultMap>
 </mapper>

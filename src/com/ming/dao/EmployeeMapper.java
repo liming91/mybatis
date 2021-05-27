@@ -16,9 +16,17 @@ public interface EmployeeMapper {
 
     public void addEmp(Employee employee);
 
+    public Long addEmps(Employee employee);
+
     public void deleteEmpByID(Integer id);
 
     public void updateEmp(Employee employee);
 
     public List<Employee> getEmpByIn(Map<String,Object> empMap);
+
+
+    public List<Employee> getEmpList();
+
+
+    public List<Employee> getEmps(Integer id);
 }
