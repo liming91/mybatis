@@ -218,7 +218,7 @@ public class MyBatisTest {
             sqlSession.close();
         }
     }
-    
+
     @Test
     public void procedureTest() throws IOException {
         SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();

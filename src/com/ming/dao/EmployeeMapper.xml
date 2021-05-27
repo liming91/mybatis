@@ -124,12 +124,14 @@ index:索引。遍历list的时候是index就是索引，item就是当前值
             from tbl_employee as em
     </select>
     
-    <!--mysql储存过程调用-->
+    <!--  mysql储存过程调用
+    1、使用select标签定义调用存储过程
+    2、statementType="CALLABLE":表示要调用存储过程
+    3、{call procedure_name(params)}-->
    <!-- public List<Employee> getEmps(Integer id);-->
     <select id="getEmps" statementType="CALLABLE" resultMap="procedureEmp">
-        CALL mb_emps(#{userId,mode=IN,jdbcType=INTEGER});
+       {CALL mb_emps(#{userId,mode=IN,jdbcType=INTEGER})}
     </select>
-
     <resultMap id="procedureEmp" type="com.ming.po.Employee">
         <id property="id" column="id"></id>
         <result property="lastName" column="last_name" jdbcType="VARCHAR"/>
