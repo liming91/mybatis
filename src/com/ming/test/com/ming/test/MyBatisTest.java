@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.ming.dao.DepartmentMapper;
 import com.ming.dao.EmployeeMapper;
 import com.ming.po.Department;
+import com.ming.po.EmpStatus;
 import com.ming.po.Employee;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.ExecutorType;
@@ -112,7 +113,7 @@ public class MyBatisTest {
     @Test
     public  void addEmp() throws IOException {
         SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
-        SqlSession sqlSession = sqlSessionFactory.openSession();
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
         try {
             EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
             Employee employee = new Employee();
@@ -231,4 +232,46 @@ public class MyBatisTest {
             sqlSession.close();
         }
     }
+
+    /**
+     * 枚举类型参数处理
+     *
+     * 默认mybatis处理枚举对象的时候保存的是枚举的名字：EnumTypeHandler
+     * 改变使用另外一种枚举处理类型：EnumOrdinalTypeHandler
+     */
+    @Test
+    public void enumEmpStatusTest() throws IOException {
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+            Employee employee = new Employee();
+            employee.setLastName(UUID.randomUUID().toString().substring(0,5));
+            employee.setEmail("1111124933@qq.com");
+            employee.setGender("1");
+            mapper.addEmp(employee);
+            System.out.println("添加成功，主键："+employee.getId());
+            sqlSession.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+
+        }
+
+    }
+
+
+    @Test
+    public void testEnumUse(){
+        EmpStatus empStatus = EmpStatus.LOGIN;
+        int ordinal = empStatus.ordinal();
+        System.out.println("枚举索引："+ordinal);
+        System.out.println("枚举名字："+empStatus.name());
+        System.out.println("状态码："+empStatus.getCode());
+        System.out.println("消息："+empStatus.getMsg());
+    }
+
+
+
 }

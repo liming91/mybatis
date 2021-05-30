@@ -1,7 +1,5 @@
 package com.ming.po;
 
-import org.apache.ibatis.type.Alias;
-
 import java.util.List;
 
 /**
@@ -16,6 +14,8 @@ public class Employee {
     private String email;
 
     private String gender;
+
+    private EmpStatus empStatus = EmpStatus.LOGIN;
 
     private List<User> userList;
 
@@ -59,6 +59,14 @@ public class Employee {
         this.userList = userList;
     }
 
+    public EmpStatus getEmpStatus() {
+        return empStatus;
+    }
+
+    public void setEmpStatus(EmpStatus empStatus) {
+        this.empStatus = empStatus;
+    }
+
     @Override
     public String toString() {
         return "Employee{" +
@@ -66,6 +74,7 @@ public class Employee {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", gender='" + gender + '\'' +
+                ", empStatus=" + empStatus +
                 ", userList=" + userList +
                 '}';
     }

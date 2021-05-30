@@ -8,15 +8,27 @@
      settings包含很多重要的设置项
      setting来设置每一个设置项，name名称，value取值
      -->
+
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="false"/>
-        <setting name="cacheEnabled" value="true"/>
     </settings>
     <!-- <typeAliases>
           <typeAlias alias="Employee" type="com.ming.po.Employee"></typeAlias>
           &lt;!&ndash;name需要扫描的包&ndash;&gt;
          <package name="com.ming.po"/>
      </typeAliases>-->
+    <!--类型处理器-->
+    <typeHandlers>
+        <!--1、配置自定义的类型处理器-->
+        <typeHandler handler="com.ming.typehandler.MyTypeHandler" javaType="com.ming.po.EmpStatus"/>
+        <!--<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="com.ming.po.EmpStatus"/>-->
+        <!--2、也可以在处理某个字段的时候告诉mybatis用什么类型处理器
+        保存：在取值的时候设置类型处理器
+        #{empStatus,TypeHandler=TypeHandler全限定类名(EnumOrdinalTypeHandler)}
+        查询： <result property="empStatus" column="empStatus" typeHandler=""/>
+        注意：如果在参数位置修改TypeHandler，应该保证保存数据和查询数据用的TypeHandler是一样的
+        -->
+    </typeHandlers>
     <!-- 注册插件-->
     <plugins>
 <!--        <plugin interceptor="com.ming.plugin.MyPlugin">-->
@@ -26,10 +38,8 @@
 <!--        <plugin interceptor="com.ming.plugin.MySecondPlugin">-->
 <!--        </plugin>-->
         <!-- com.github.pagehelper为PageHelper类所在包名 -->
-        <plugin interceptor="com.github.pagehelper.PageInterceptor">
-            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
-            <property name="param1" value="value1"/>
-        </plugin>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"/>
+
     </plugins>
     <!-- 环境配置，可以配置多个环境 default指定使用某种环境，可以快速到达切换测试环境和生产环境-->
     <environments default="development">

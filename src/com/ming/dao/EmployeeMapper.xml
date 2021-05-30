@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ming.dao.EmployeeMapper">
-    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+<!--    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>-->
     <resultMap id="employeeResult" type="com.ming.po.Employee">
         <id property="id" column="id"/>
         <result property="lastName" column="last_name" jdbcType="VARCHAR"/>
@@ -81,7 +81,7 @@
     keyProperty:指定对应的主键属性，也就是mybatis获取主键后，将这个值封装给JavaBean的哪个属性
     -->
     <insert id="addEmp" parameterType="com.ming.po.Employee" useGeneratedKeys="true" keyProperty="id">
-        insert  into tbl_employee(last_name,gender,email) values (#{lastName},#{gender} ,#{email});
+        insert  into tbl_employee(last_name,gender,email,empStatus) values (#{lastName},#{gender} ,#{email},#{empStatus});
     </insert>
 
     <insert id="addEmps" parameterType="com.ming.po.Employee" useGeneratedKeys="true" keyProperty="id">
@@ -137,5 +137,6 @@ index:索引。遍历list的时候是index就是索引，item就是当前值
         <result property="lastName" column="last_name" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
         <result property="gender" column="gender" jdbcType="VARCHAR"/>
+<!--        <result property="empStatus" column="empStatus" typeHandler=""/>-->
     </resultMap>
 </mapper>
